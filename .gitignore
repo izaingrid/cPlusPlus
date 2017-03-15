@@ -27,3 +27,8 @@
 *.exe
 *.out
 *.app
+
+Vector/.vs/
+Vector/2_projekt/Debug/
+Vector/Debug/
+Vector/Vector.VC.db
