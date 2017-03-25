@@ -1,36 +1,24 @@
 #include<iostream>
 #include "Vector.hpp"
 
-using namespace std;
-
-struct asd{
-	asd(int){}
-};
-
-
 int main(){
 	int t[]={1,2,3};
-	int p[]={9,8,7};
-	//vector<asd> cica(3);
+	int p[]={9,8,0};
 	vector<int> a(3,t);
 	vector<int> b(3,p);
-	cout <<"a: ";
-	a.write();
-	cout <<"b: ";
-	b.write();
+	std::cout <<"a: "<<a<< std::endl;
+	std::cout <<"b: "<<b<< std::endl;
 	try{
-        cout<<"a+b:"<<endl;
-        (a+b).write();
-        cout <<"a-b:"<<endl;
-        (a-b).write();
-        cout <<"a*b: "<<a*b<<endl;
-        cout <<"a%b: "<<a%b<<endl;
+		std::cout <<"a+b: "<< a + b << std::endl;
+		std::cout <<"a-b: "<< a - b << std::endl;
+        std::cout <<"a*b: "<< a * b << std::endl;
+        std::cout <<"a%b: "<< a % b << std::endl;
 	}
-	catch(const char *s){
-        cout <<s<<endl;
+	catch(const std::exception& e){
+        std::cout <<e.what()<<std::endl;
 	}
-	cout <<"~a: "<<~a<<endl;
-	cout<<"1.: "<<a[0]<<endl;
+	std::cout <<"~a: "<<~a<< std::endl;
+	std::cout<<"a[0]= "<<a[0]<< std::endl;
 
 
 	elem<int> aa[3];//={(5,0),(10,2),(20,4)};
@@ -46,33 +34,24 @@ int main(){
 	sparseVector<int> e(3,2,aa);
 	sparseVector<int> h(3,1,bb);
 
-
-    cout <<"e: ";
-    e.write();
-	cout <<"h";
-	h.write();
+	std::cout <<"e: "<<e<<std::endl;
+	std::cout <<"h: "<<h<<std::endl;
 	try{
-        cout <<"e+h: ";
-        (e+h).write();
-        cout <<"e-h:";
-        (e-h).write();
-        cout <<"e*h: "<<e*h<<endl;
-		cout <<"e%h: "<<e%h<<endl;
+		std::cout << "e+h: " << e + h << std::endl;
+		std::cout << "e-h: " << e - h << std::endl;
+		std::cout << "e*h: " << e * h << std::endl;
+		std::cout << "e%h: " << e % h << std::endl;
 	}
-	catch(const char* s){
-        cout <<s<<endl;
+	catch (const std::exception& e) {
+		std::cout << e.what() << std::endl;
 	}
-	cout <<"~e: "<<~e<<endl;
-	cout<<"1.: "<<h[0]<<endl;
+	std::cout <<"~e: "<<~e<<std::endl;
+	std::cout<<"e[0]= "<<e[0]<<std::endl;
 
-	vector<int> c;
-	c=e;
-	cout<<"c=e: ";
-	c.write();
+	vector<int> c=e;
+	std::cout << "c=e: " << c << std::endl;
 
-    sparseVector<int> v;
-    v=a;
-    cout<<"v=a: ";
-	v.write();
-	cin.get();
+    sparseVector<int> v=a;
+	std::cout<<"v=a: "<<v<< std::endl;
+	system("PAUSE");
 }

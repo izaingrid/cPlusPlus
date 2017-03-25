@@ -1,7 +1,8 @@
 #include<iostream>
+#include<numeric>
+#include<algorithm>
+#include<functional>
 #include<cmath>
-
-using namespace std;
 
 #pragma once
 
@@ -17,7 +18,7 @@ class sparseVector;
 template<class T>
 class vector {
 	int dim;
-	T *t;
+	T *t ;
 public:
 	vector() : dim(0),t(nullptr) { }
 	~vector() 
@@ -35,7 +36,7 @@ public:
 	double operator~();//euclidean norm
 	double operator%(const vector<T> &v); //euclidean distance
 	T operator[](int a);	//get index
-	void write();
+	void write(std::ostream& os) const;
 	vector(const sparseVector<T>& v); //implicit
 	void getDim(int &n) const
 	{
@@ -55,9 +56,9 @@ class sparseVector {
 	int count;
 	elem<T> *t;
 public:
-	sparseVector() { dim = 0; count = 0; t = nullptr; }
+	sparseVector():dim(0),count(0),t(nullptr){ }
 	~sparseVector() { if (count) delete[]t; }
-	sparseVector(int n) { dim = n; count = 0; }
+	sparseVector(int n) :dim(n),count(0){}
 	sparseVector(int n, int eleme, elem<T> *a);
 	sparseVector(const sparseVector<T> &v);
 	sparseVector(const vector<T>& v); //implicit
@@ -68,7 +69,7 @@ public:
 	double operator~();//euclidean norma
 	double operator%(const sparseVector<T> &v);
 	T operator [](int a);
-	void write();
+	void write(std::ostream& os) const;
 
 	void pass(int &aDim, int &aCount)const
 	{
@@ -78,11 +79,7 @@ public:
 
 	void get(elem<T> *a)const
 	{
-		for (int i = 0; i < count; i++)
-		{
-			a[i].pos = t[i].pos;
-			a[i].info = t[i].info;
-		}
+		std::copy(t, t + count, a);
 	}
 }; 
 
@@ -90,30 +87,17 @@ template<class T>
 vector<T>::vector(int n, T* a) {
 	dim = n;
 	t = new T[n];
-	for (int i = 0; i < n; i++)
-	{
-		t[i] = a[i];
-	}
+	std::copy(a,a+n,t);
 }
 
 template<class T>
-vector<T>::vector(int n) {
-	dim = n;
-	t = new T[n];
-	for (int i = 0; i < n; i++)
-	{
-		t[i] = T();
-	}
-}
+vector<T>::vector(int n) : dim(n), t(new T[n]()) {}
 
 template<class T>
 vector<T>::vector(const vector<T> &v) {
 	dim = v.dim;
 	t = new T[dim];
-	for (int i = 0; i < dim; i++)
-	{
-		t[i] = v.t[i];
-	}
+	std::copy(v.t, v.t + dim, t);
 }
 
 template<class T>
@@ -125,20 +109,16 @@ vector<T>& vector<T>::operator=(const vector<T> &v)
 		if (t)
 			delete[] t;
 		t = new T[dim];
-		for (int i = 0; i < dim; i++)
-		{
-			t[i] = v.t[i];
-		}
+		std::copy(v.t, v.t + dim, t);
 	}
 	return *this;
 }
-
 
 template<class T>
 vector<T> vector<T>::operator+(const vector<T> &v) 
 {
 	if (dim != v.dim)
-		throw "The dimensions are not equal.";
+		throw std::exception("The dimensions are not equal."); 
 	vector newVector(dim);
 	for (int i = 0; i < dim; i++)
 	{
@@ -151,8 +131,8 @@ template<class T>
 vector<T> vector<T>::operator-(const vector<T> &v) 
 {
 	if (dim != v.dim)
-		throw "The dimensions are not equal.";
-	vector newVector(dim);
+		throw std::exception("The dimensions are not equal.");
+	vector<T> newVector(dim);
 	for (int i = 0; i < dim; i++)
 	{
 		newVector.t[i] = t[i] - v.t[i];
@@ -164,7 +144,7 @@ template<class T>
 double vector<T>::operator*(const vector<T> &v) 
 {
 	if (dim != v.dim)
-		throw "The dimensions are not equal.";
+		throw std::exception("The dimensions are not equal.");
 	double sum = 0;
 	for (int i = 0; i < dim; i++)
 	{
@@ -187,7 +167,7 @@ double vector<T>::operator~() //euclidean norm
 template<class T>
 double vector<T>::operator %(const vector<T> &v) { //euclidean distance
 	if (dim != v.dim)
-		throw "The dimensions are not equal.";
+		throw std::exception("The dimensions are not equal.");
 	double sum = 0;
 	for (int i = 0; i < dim; i++)
 	{
@@ -201,21 +181,19 @@ T vector<T>::operator[](int a) //get value
 {
 	if (a >= 0 && a < dim)
 		return t[a];
-	throw "The given index does not exist.";
+	throw std::exception("The given index does not exist.");
 }
 
 template<class T>
-void vector<T>::write() 
+void vector<T>::write(std::ostream& os) const
 {
-	cout << "dim: " << dim << endl;
-	cout << "( ";
+	os << "( ";
 	for (int i = 0; i < dim - 1; i++)
 	{
-		cout << t[i] << ", ";
+		os << t[i] << ", ";
 	}
-	cout << t[dim - 1] << ")" << endl;
+	os << t[dim - 1] << ")" ;
 }
-
 
 template <class T>
 sparseVector<T>::sparseVector(int n, int aCount, elem<T> *a) 
@@ -223,11 +201,7 @@ sparseVector<T>::sparseVector(int n, int aCount, elem<T> *a)
 	dim = n;
 	count = aCount;
 	t = new elem<T>[count];
-	for (int i = 0; i < count; i++)
-	{
-		t[i].info = a[i].info;
-		t[i].pos = a[i].pos;
-	}
+	std::copy(a,a+count,t);
 }
 
 template <class T>
@@ -236,11 +210,7 @@ sparseVector<T>::sparseVector(const sparseVector<T> &v)
 	dim = v.dim;
 	count = v.count;
 	t = new elem<T>[count];
-	for (int i = 0; i < count; i++)
-	{
-		t[i].info = v.t[i].info;
-		t[i].pos = v.t[i].pos;
-	}
+	std::copy(v.t,v.t+count,t);
 }
 
 template<class T>
@@ -253,11 +223,7 @@ sparseVector<T>& sparseVector<T>::operator=(const sparseVector<T>& v)
 		if (t)
 			delete[] t;
 		t = new elem<T>[count];
-		for (int i = 0; i < count; i++)
-		{
-			t[i].pos = v.t[i].pos;
-			t[i].info = v.t[i].info;
-		}
+		std::copy(v.t, v.t + count, t);
 	}
 	return *this;
 }
@@ -266,12 +232,10 @@ template <class T>
 sparseVector<T> sparseVector<T>::operator+(const sparseVector<T> &v) 
 {
 	if (dim != v.dim)
-		throw "The dimensions are not equal.";
-	int *p = new int[dim], s = 0;
-	for (int i = 0; i < dim; i++)
-	{
-		p[i] = 0;
-	}
+		throw std::exception("The dimensions are not equal.");
+	T *p = new T[dim];
+	int s = 0;
+	std::fill(p,p+dim,T());
 	for (int i = 0; i < count; i++)
 	{
 		p[t[i].pos] = t[i].info;
@@ -307,13 +271,10 @@ template <class T>
 sparseVector<T> sparseVector<T>::operator-(const sparseVector<T> &v) 
 {
 	if (dim != v.dim)
-		throw "The dimensions are not equal.";
-	int *p = new int[dim];
+		throw std::exception("The dimensions are not equal.");
+	T *p = new T[dim];
 	int s = 0;
-	for (int i = 0; i < dim; i++)
-	{
-		p[i] = 0;
-	}
+	std::fill(p,p+dim,T());
 	for (int i = 0; i < count; i++)
 	{
 		p[t[i].pos] = t[i].info;
@@ -345,17 +306,15 @@ sparseVector<T> sparseVector<T>::operator-(const sparseVector<T> &v)
 }
 
 template<class T>
-double sparseVector<T>::operator*(const sparseVector<T> &v)  //skalarszorzat
+double sparseVector<T>::operator*(const sparseVector<T> &v)  //dot product
 {
 	if (dim != v.dim)
-		throw "The dimensions are not equal.";
-	T *b = new T[dim], k = 0;
+		throw std::exception("The dimensions are not equal.");
+	T *b = new T[dim];
 	T *h = new T[dim];
-	for (int i = 0; i < dim; i++)
-	{
-		b[i] = 0;
-		h[i] = 0;
-	}
+	double k = 0;
+	std::fill(b, b + dim, T());
+	std::fill(h, h + dim, T());
 	for (int i = 0; i < count; i++)
 	{
 		b[t[i].pos] = t[i].info;
@@ -374,9 +333,9 @@ double sparseVector<T>::operator*(const sparseVector<T> &v)  //skalarszorzat
 }
 
 template <class T>
-double sparseVector<T>::operator~() //euklideszi norma
+double sparseVector<T>::operator~() //euclidean norm
 {
-	T k = 0;
+	double k = 0;
 	for (int i = 0; i < count; i++)
 	{
 		k += t[i].info * t[i].info;
@@ -388,14 +347,12 @@ template <class T>
 double sparseVector<T>::operator%(const sparseVector<T> &v) 
 {
 	if (dim != v.dim)
-		throw "The dimensions are not equal.";
-	T *b = new T[dim], k = 0;
+		throw std::exception("The dimensions are not equal.");
+	T *b = new T[dim];
 	T *h = new T[dim];
-	for (int i = 0; i < dim; i++)
-	{
-		b[i] = 0;
-		h[i] = 0;
-	}
+	double k = 0;
+	std::fill(b, b + dim, T());
+	std::fill(h, h + dim, T());
 	for (int i = 0; i < count; i++)
 	{
 		b[t[i].pos] = t[i].info;
@@ -416,32 +373,28 @@ double sparseVector<T>::operator%(const sparseVector<T> &v)
 template <class T>
 T sparseVector<T>::operator [](int a) 
 {
-	if (a >= dim)
+	if (a<0 || a >= dim)
 	{
-		throw "This index dose not exist.";
+		throw std::exception("This index dose not exist.");
 	}
 	for (int i = 0; i < count; i++)
 	{
 		if (t[i].pos == a)
 			return t[i].info;
 	}
-	return 0;
+	return T();
 }
 
 template<class T>
 vector<T>::vector(const sparseVector<T>& v)  //implicit
 {
 	elem <T> *a;
-	int n, elemek;
-	v.pass(n, elemek);
+	int elemek;
+	v.pass(dim, elemek);
 	a = new elem<T>[elemek];
 	v.get(a);
-	dim = n;
 	t = new T[dim];
-	for (int i = 0; i < dim; i++)
-	{
-		t[i] = 0;
-	}
+	std::fill(t,t+dim,T());
 	for (int i = 0; i < elemek; i++)
 	{
 		t[a[i].pos] = a[i].info;
@@ -451,11 +404,8 @@ vector<T>::vector(const sparseVector<T>& v)  //implicit
 template<class T>
 sparseVector<T>::sparseVector(const vector<T>& v) //implicit
 { 
-	int n;
-	T *a;
-	v.getDim(n);
-	dim = n;
-	a = new T[dim];
+	v.getDim(dim);
+	T *a = new T[dim];
 	v.getVector(a);
 	int e = 0;
 	for (int i = 0; i < dim; i++)
@@ -479,8 +429,8 @@ sparseVector<T>::sparseVector(const vector<T>& v) //implicit
 }
 
 template <class T>
-void sparseVector<T>::write() {
-	cout << "(";
+void sparseVector<T>::write(std::ostream& os) const {
+	os << "(";
 	for (int i = 0; i < dim; i++)
 	{
 		int j = 0;
@@ -489,13 +439,26 @@ void sparseVector<T>::write() {
 		{
 			if (t[j].pos == i)
 			{
-				cout << t[j].info << ", ";
+				os << t[j].info << ", ";
 				exists = 0;
 			}
 			j++;
 		}
 		if (exists)
-			cout << "0, ";
+			os << "0, ";
 	}
-	cout << "\b\b)" << endl;
+	os << "\b\b)";
+}
+
+
+template<class T>
+std::ostream& operator<<(std::ostream& os, const vector<T> &v) {
+	v.write(os);
+	return os;
+}
+
+template<class T>
+std::ostream& operator<<(std::ostream& os, const sparseVector<T> &v) {
+	v.write(os);
+	return os;
 }
