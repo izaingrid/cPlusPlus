@@ -11,11 +11,11 @@ int main(){
 	try{
 		std::cout <<"a+b: "<< a + b << std::endl;
 		std::cout <<"a-b: "<< a - b << std::endl;
-        std::cout <<"a*b: "<< a * b << std::endl;
-        std::cout <<"a%b: "<< a % b << std::endl;
+		std::cout <<"a*b: "<< a * b << std::endl;
+		std::cout <<"a%b: "<< a % b << std::endl;
 	}
 	catch(const std::exception& e){
-        std::cout <<e.what()<<std::endl;
+		std::cout <<e.what()<<std::endl;
 	}
 	std::cout <<"~a: "<<~a<< std::endl;
 	std::cout<<"a[0]= "<<a[0]<< std::endl;
@@ -51,7 +51,7 @@ int main(){
 	vector<int> c=e;
 	std::cout << "c=e: " << c << std::endl;
 
-    sparseVector<int> v=a;
+	sparseVector<int> v=a;
 	std::cout<<"v=a: "<<v<< std::endl;
 	system("PAUSE");
 }

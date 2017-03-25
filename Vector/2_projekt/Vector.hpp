@@ -27,7 +27,7 @@ public:
 			delete[] t; 
 	}
 	vector(int n, T *a);
-	vector(int n);
+	vector(int n): dim(n), t(new T[n]()) {}
 	vector(const vector<T> &v);
 	vector<T> operator+(const vector<T> &v);
 	vector<T> operator-(const vector<T> &v);
@@ -89,9 +89,6 @@ vector<T>::vector(int n, T* a) {
 	t = new T[n];
 	std::copy(a,a+n,t);
 }
-
-template<class T>
-vector<T>::vector(int n) : dim(n), t(new T[n]()) {}
 
 template<class T>
 vector<T>::vector(const vector<T> &v) {
@@ -449,7 +446,6 @@ void sparseVector<T>::write(std::ostream& os) const {
 	}
 	os << "\b\b)";
 }
-
 
 template<class T>
 std::ostream& operator<<(std::ostream& os, const vector<T> &v) {
